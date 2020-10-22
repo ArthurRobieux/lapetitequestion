@@ -8,25 +8,8 @@ from polls.handlers import (
     handle_get_polls,
     handle_create_poll,
     handle_get_poll_detail,
-    handle_get_questions,
-    handle_create_question,
-    handle_get_question_detail,
+    handle_delete_poll,
 )
-
-
-@api_view(["GET", "POST"])
-def questions_view(request):
-    if request.method == "GET":
-        return handle_get_questions()
-
-    elif request.method == "POST":
-        return handle_create_question(request.data)
-
-
-@api_view(["GET"])
-def question_detail_view(request, question_id=None):
-    if request.method == "GET":
-        return handle_get_question_detail(question_id)
 
 
 @api_view(["GET", "POST"])
@@ -38,7 +21,10 @@ def polls_view(request):
         return handle_create_poll(request.data)
 
 
-@api_view(["GET"])
+@api_view(["GET", "DELETE"])
 def poll_detail_view(request, poll_id=None):
     if request.method == "GET":
         return handle_get_poll_detail(poll_id)
+
+    elif request.method == "DELETE":
+        return handle_delete_poll(poll_id)

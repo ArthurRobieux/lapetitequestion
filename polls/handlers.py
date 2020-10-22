@@ -5,33 +5,6 @@ from polls.models import Poll, Question, Choice
 from polls.serializers import PollSerializer, QuestionSerializer, ChoiceSerializer
 
 
-# Questions
-
-
-def handle_get_questions():
-    questions = Question.objects.all()
-    serializer = QuestionSerializer(questions, many=True)
-    return Response(serializer.data)
-
-
-def handle_create_question(data):
-    serializer = QuestionSerializer(data=data)
-    if serializer.is_valid():
-        Question.objects.create(**serializer.data)
-
-        return Response("Question created", status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-def handle_get_question_detail(question_id):
-    question = Question.objects.get(id=question_id)
-    serializer = QuestionSerializer(question)
-    return Response(serializer.data)
-
-
-# Polls
-
-
 def handle_get_polls():
     polls = Poll.objects.all()
     serializer = PollSerializer(polls, many=True)
@@ -39,10 +12,17 @@ def handle_get_polls():
 
 
 def handle_create_poll(data):
+
+    print("DATA", data)
+
     serializer = PollSerializer(data=data)
+
+    print("SERIALIZER", serializer, serializer.is_valid())
+
     if serializer.is_valid():
-        questions_data = serializer.data.pop("questions")
-        Poll.objects.create(**serializer.data)
+        poll_data = serializer.data
+        questions_data = poll_data.pop("questions")
+        poll = Poll.objects.create(**poll_data)
         for question_data in questions_data:
             choices_data = question_data.pop("choices")
             question = Question.objects.create(poll=poll, **question_data)
@@ -54,6 +34,18 @@ def handle_create_poll(data):
 
 
 def handle_get_poll_detail(poll_id):
-    poll = Poll.objects.get(id=poll_id)
-    serializer = PollSerializer(poll)
-    return Response(serializer.data)
+    try:
+        poll = Poll.objects.get(id=poll_id)
+        serializer = PollSerializer(poll)
+        return Response(serializer.data)
+    except:
+        return Response("This poll doesn't exists", status=status.HTTP_400_BAD_REQUEST)
+
+
+def handle_delete_poll(poll_id):
+    try:
+        poll = Poll.objects.get(id=poll_id)
+        poll.delete()
+        return Response("Poll deleted", status=status.HTTP_200_OK)
+    except:
+        return Response("This poll doesn't exists", status=status.HTTP_400_BAD_REQUEST)

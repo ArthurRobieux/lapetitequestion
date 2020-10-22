@@ -9,9 +9,6 @@ class Poll(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.title
-
     def was_published_today(self):
         return self.created_at >= timezone.now() - datetime.timedelta(days=1)
 

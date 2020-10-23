@@ -9,6 +9,7 @@ from polls.handlers import (
     handle_create_poll,
     handle_get_poll_detail,
     handle_delete_poll,
+    handle_create_poll_answer,
 )
 
 
@@ -21,10 +22,19 @@ def polls_view(request):
         return handle_create_poll(request.data)
 
 
-@api_view(["GET", "DELETE"])
+@api_view(["GET", "POST", "DELETE"])
 def poll_detail_view(request, poll_id=None):
     if request.method == "GET":
         return handle_get_poll_detail(poll_id)
 
+    elif request.method == "POST":
+        return handle_create_poll_answer(poll_id, request.data)
+
     elif request.method == "DELETE":
         return handle_delete_poll(poll_id)
+
+
+@api_view(["POST"])
+def poll_answer_view(request, poll_id=None):
+    if request.method == "POST":
+        return handle_create_poll_answer(poll_id, request.data)

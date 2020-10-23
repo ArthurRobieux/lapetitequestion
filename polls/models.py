@@ -15,19 +15,29 @@ class Poll(models.Model):
 
 class Question(models.Model):
     poll = models.ForeignKey(Poll, related_name="questions", on_delete=models.CASCADE)
+
     description = models.CharField(max_length=200)
     question_type = models.CharField(max_length=200)
 
+
+class Answer(models.Model):
+    question = models.ForeignKey(
+        Question, related_name="answers", on_delete=models.CASCADE, default=None
+    )
+
+    name = models.CharField(max_length=200)
+    text = models.CharField(max_length=200, default=None)
+
     def __str__(self):
-        return self.description
+        return self.name
 
 
 class Choice(models.Model):
     question = models.ForeignKey(
         Question, related_name="choices", on_delete=models.CASCADE
     )
+
     description = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.description

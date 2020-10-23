@@ -9,4 +9,7 @@ from rest_framework import routers
 urlpatterns = [
     path("polls/", views.polls_view, name="polls_view"),
     path("polls/<int:poll_id>/", views.poll_detail_view, name="poll_detail_view"),
+    path(
+        "polls/<int:poll_id>/answer/", views.poll_answer_view, name="poll_answer_view"
+    ),
 ]

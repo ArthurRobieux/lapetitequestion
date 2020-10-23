@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework import status
-from polls.models import Poll, Question, Choice, Answer
+from polls.models import Poll, Question, Choice, Answer, AnswerChoice
 from polls.serializers import (
     PollSerializer,
     QuestionSerializer,
@@ -67,19 +67,23 @@ def handle_create_poll_answer(poll_id, answers_data):
         return Response("This poll doesn't exists", status=status.HTTP_400_BAD_REQUEST)
 
     poll = Poll.objects.get(id=poll_id)
-    serializer = CreateAnswersSerializer(data=answers_data, many=True)
+    serializer = CreateAnswersSerializer(data=answers_data)
 
     if serializer.is_valid():
-        for answer_data in answers_data:
-            print("LALALLA", answer_data)
+        name = answers_data.pop("name")
+        for answer_data in answers_data["answers"]:
 
             try:
                 question_id = answer_data.pop("question_id")
                 question = Question.objects.get(poll=poll, id=question_id)
-                print("question", question)
-                print("ADEZKFZRF", answer_data)
+                choice_ids = answer_data.pop("choice_ids")
+                answer = Answer.objects.create(
+                    question=question, name=name, **answer_data
+                )
 
-                Answer.objects.create(question=question, **answer_data)
+                for choice_id in choice_ids:
+                    ac = AnswerChoice.objects.create(answer=answer, choice_id=choice_id)
+
             except:
                 return Response(
                     "This question doesn't exists", status=status.HTTP_400_BAD_REQUEST

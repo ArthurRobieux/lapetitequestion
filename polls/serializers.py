@@ -1,20 +1,32 @@
 from rest_framework import serializers
 
 from django.contrib.auth.models import User, Group
-from polls.models import Poll, Question, Choice, Answer
+from polls.models import Poll, Question, Choice, Answer, AnswerChoice
+
+
+class CreateAnswerSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField()
+    text = serializers.CharField(required=False, allow_blank=True)
+    choice_ids = serializers.ListField(child=serializers.IntegerField(), required=False)
 
 
 class CreateAnswersSerializer(serializers.Serializer):
-    question_id = serializers.IntegerField()
     name = serializers.CharField()
-    text = serializers.CharField(required=False)
-    choice_ids = serializers.IntegerField(required=False)
+    answers = CreateAnswerSerializer(many=True)
+
+
+class AnswerChoiceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = AnswerChoice
+        fields = ["choice_id"]
 
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+    choices = AnswerChoiceSerializer(many=True)
+
     class Meta:
         model = Answer
-        fields = ["name", "text"]
+        fields = ["name", "text", "choices"]
 
 
 class ChoiceSerializer(serializers.HyperlinkedModelSerializer):

@@ -32,12 +32,20 @@ class Answer(models.Model):
         return self.name
 
 
+class AnswerChoice(models.Model):
+    answer = models.ForeignKey(
+        Answer, related_name="choices", on_delete=models.CASCADE, default=None
+    )
+
+    choice_id = models.IntegerField()
+
+
 class Choice(models.Model):
     question = models.ForeignKey(
         Question, related_name="choices", on_delete=models.CASCADE
     )
 
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, default=None)
 
     def __str__(self):
         return self.description
